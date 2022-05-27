@@ -11,7 +11,7 @@ test:
 	pytest -vv
 
 clean:
-	sudo rm -rf s3_data && mkdir s3_data
+	rm -rf s3_data && mkdir s3_data
 
 mkbucket:
 	mkdir -p s3_data/data-bucket && touch s3_data/data-bucket/.gitkeep
@@ -58,6 +58,6 @@ points_leaders:
 	  -e PGPASSWORD=password \
 	  --entrypoint psql \
 	  postgres:12-alpine \
-	  -h localhost -U postgres -c "select * from points_leaders order by points limit 10;"
+	  -h localhost -U postgres -c "select * from points_leaders order by points DESC LIMIT 10;"
 	
 
