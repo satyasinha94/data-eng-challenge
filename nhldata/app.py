@@ -17,6 +17,8 @@ import requests
 import pandas as pd
 from botocore.config import Config
 from dateutil.parser import parse as dateparse
+import os
+import argparse
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
@@ -176,13 +178,11 @@ class Crawler:
                             player_stats_df = player_stats_df.append(player_stats, ignore_index=True)
                 s3_key = StorageKey(row["gamePk"], game_date)
                 self.storage.store_game(s3_key, player_stats_df[player_columns].to_csv(index=False))
-                logging.info(f"WRITING FILE: {s3_key.key()}")
+                logging.info(f"WRITING FILE: {s3_key.key()} to s3_data/{self.storage.bucket}/{s3_key.key()}")
         logging.info(f"FILE WRITES COMPLETE")
 
 
 def main():
-    import os
-    import argparse
     parser = argparse.ArgumentParser(description='NHL Stats crawler')
     parser.add_argument('--start-date', type=str, help="format: yyyy-mm-dd")
     parser.add_argument('--end-date', type=str, help="format: yyyy-mm-dd")
