@@ -1,6 +1,7 @@
 
 .PHONY: init test step1 step2 catalog_data run_sql dbt_run dbt_test
 
+BACKSLASH = '\\'
 
 init:
 	pip install -r requirements.txt
@@ -20,13 +21,16 @@ down:
 
 step1: down clean mkbucket
 	docker-compose up --build
-	
 #--- part two
 catalog_data:
-	[ -f s3_data/load_data.sql ] && rm s3_data/load_data.sql; \
-	  find s3_data/data-bucket -name "*.csv" -exec echo "\copy game_stats from '{}' WITH (FORMAT csv, HEADER);" \; >> s3_data/load_data.sql
+			  touch s3_data/load_data.sql
+			  rm s3_data/load_data.sql
+			  @for f in $(shell ls s3_data/data-bucket); \
+			  do echo $(BACKSLASH)copy game_stats from s3_data/data-bucket/$${f} \
+			  WITH \(FORMAT csv, HEADER\) >> s3_data/load_data.sql; done
 
-run_sql: catalog_data 
+
+run_sql: catalog_data
 	docker exec \
 	  -w /data \
 	  $$(basename $(PWD))_db_1 \

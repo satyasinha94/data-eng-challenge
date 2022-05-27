@@ -6,7 +6,7 @@ WITH ranked_teams AS (
       RANK() OVER (PARTITION BY team_name ORDER BY points DESC) AS rank
     from {{ ref('nhl_players') }}
     WHERE
-      points <= 0
+      points > 0
 )
 SELECT
   team_name,
